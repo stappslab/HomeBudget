@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeBudget · predlozi prikaza statistike</title>
+<style>
+:root{--page:#dfe5df;--bg:#0b1112;--panel:#111b1c;--panel2:#192526;--line:#2b3939;--text:#f1f4ef;--muted:#aab6b0;--green:#a8d4b0;--green2:#679a7f;--blue:#9fc5dc;--peach:#e2ad8c;--gold:#d7d29a;--dim:#334141}*{box-sizing:border-box}body{margin:0;padding:26px 18px 40px;background:var(--page);font:15px "Segoe UI",sans-serif;color:#182222}h1{max-width:1320px;margin:0 auto 8px;font-size:32px}.intro{max-width:1320px;margin:0 auto 24px;color:#53625c;line-height:1.55}.options{max-width:1320px;margin:auto;display:grid;grid-template-columns:repeat(3,minmax(285px,1fr));gap:18px;align-items:start}.phone{min-height:740px;background:var(--bg);color:var(--text);border-radius:25px;padding:17px 16px 20px;box-shadow:0 18px 32px #17242235;overflow:hidden}.tag{font-size:11px;text-transform:uppercase;color:var(--green);font-weight:800;margin-bottom:10px}.title{font-size:25px;margin:0;font-weight:750}.period{margin-top:5px;color:var(--muted);font-size:13px}.total-label{margin-top:24px;color:var(--muted);font-size:13px}.total{font-size:38px;font-weight:800;margin:3px 0 18px}.unit{font-size:15px;color:var(--muted);font-weight:600}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 22px}.metric{border-top:2px solid var(--green);padding-top:8px}.metric.personal{border-color:var(--peach)}.metric label{display:block;color:var(--muted);font-size:12px}.metric strong{font-size:19px;display:block;margin-top:3px}.section-title{font-weight:750;font-size:15px;margin:20px 0 10px}.legend{display:flex;gap:14px;color:var(--muted);font-size:11px;margin:8px 0 14px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--green)}.dot.personal{background:var(--peach)}.cat{margin:12px 0 14px}.cat-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:6px}.cat-head span:first-child{font-weight:700}.cat-head span:last-child{color:var(--muted)}.stack{height:12px;width:100%;display:flex;background:var(--dim);border-radius:7px;overflow:hidden}.common{height:100%;background:var(--green2)}.personal-part{height:100%;background:var(--peach)}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{text-align:left;color:var(--muted);font-weight:600;padding:8px 3px;border-bottom:1px solid var(--line)}.table th:not(:first-child),.table td:not(:first-child){text-align:right}.table td{padding:10px 3px;border-bottom:1px solid var(--line)}.member{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.member-name{font-weight:700}.member-sub{color:var(--muted);font-size:11px;margin-top:3px}.member-value{text-align:right;font-weight:700}.balance{margin-top:19px;padding:13px;border-left:3px solid var(--blue);background:var(--panel2)}.balance small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.balance strong{font-size:16px}.balance p{margin:6px 0 0;color:var(--muted);font-size:12px}.grand{display:flex;justify-content:space-between;align-items:end;padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:12px 0}.grand strong{font-size:21px}.subnote{color:var(--muted);font-size:11px;line-height:1.5}.foot{max-width:1320px;margin:18px auto 0;color:#53625c;font-size:13px}@media(max-width:980px){.options{grid-template-columns:repeat(2,minmax(275px,1fr))}}@media(max-width:640px){body{padding:18px 12px 28px}.options{grid-template-columns:1fr}.phone{min-height:690px}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<h1>Statistika · predlozi prikaza teksta</h1>
+<p class="intro">Tri vizuelna tretmana istih podataka. Svaki zadržava kategorijski stacked bar (zajedničko + lično), jasno formatirane iznose i kumulativnu razliku članova. Odaberi A, B ili C za dalju doradu.</p>
+<div class="options">
+<section class="phone">
+  <div class="tag">A · Izveštaj</div><h2 class="title">Statistika</h2><div class="period">Septembar 2026 · RSD</div>
+  <div class="total-label">Ukupna potrošnja</div><div class="total">29.139 <span class="unit">RSD</span></div>
+  <div class="split"><div class="metric"><label>Zajednička</label><strong>21.243 RSD</strong></div><div class="metric personal"><label>Lična</label><strong>7.896 RSD</strong></div></div>
+  <div class="section-title">Potrošnja po kategoriji</div><div class="legend"><span><i class="dot"></i>Zajednička</span><span><i class="dot personal"></i>Lična</span></div>
+  <div class="cat"><div class="cat-head"><span>Pokloni</span><span>13.243 RSD</span></div><div class="stack"><i class="common" style="width:72%"></i><i class="personal-part" style="width:28%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Hrana</span><span>8.000 RSD</span></div><div class="stack"><i class="common" style="width:43%"></i><i class="personal-part" style="width:17%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Izlasci</span><span>7.896 RSD</span></div><div class="stack"><i class="common" style="width:25%"></i><i class="personal-part" style="width:35%"></i></div></div>
+  <div class="section-title">Po članu</div>
+  <div class="member"><div><div class="member-name">Srki</div><div class="member-sub">Zajedničko 14.700 RSD</div></div><div class="member-value">14.700 RSD</div></div>
+  <div class="member"><div><div class="member-name">Milica</div><div class="member-sub">Zajedničko 6.543 RSD</div></div><div class="member-value">14.439 RSD</div></div>
+  <div class="balance"><small>Kumulativno od poslednjeg resetovanja</small><strong>Srki · prednost 8.157 RSD</strong></div>
+</section>
+<section class="phone">
+  <div class="tag">B · Porodični pregled</div><h2 class="title">Ovaj mesec</h2><div class="period">Statistika domaćinstva · Septembar 2026</div>
+  <div class="grand"><div><div class="total-label" style="margin:0">Ukupno potrošeno</div><strong>29.139 RSD</strong></div><div style="text-align:right" class="subnote">3 kategorije<br>2 člana</div></div>
+  <div class="split"><div class="metric"><label>ZAJEDNIČKO</label><strong>21.243</strong></div><div class="metric personal"><label>LIČNO</label><strong>7.896</strong></div></div>
+  <div class="section-title">Gde je novac otišao</div><div class="legend"><span><i class="dot"></i>Zajedničko</span><span><i class="dot personal"></i>Lično</span></div>
+  <div class="cat"><div class="cat-head"><span>Pokloni</span><b>13.243 RSD</b></div><div class="stack"><i class="common" style="width:65%"></i><i class="personal-part" style="width:35%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Hrana</span><b>8.000 RSD</b></div><div class="stack"><i class="common" style="width:42%"></i><i class="personal-part" style="width:18%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Izlasci</span><b>7.896 RSD</b></div><div class="stack"><i class="common" style="width:25%"></i><i class="personal-part" style="width:35%"></i></div></div>
+  <div class="section-title">Doprinos članova</div>
+  <div class="member"><div><div class="member-name">Srki</div><div class="member-sub">14.700 ukupno · 14.700 zajedničko</div></div><div class="member-value">50%</div></div>
+  <div class="member"><div><div class="member-name">Milica</div><div class="member-sub">14.439 ukupno · 6.543 zajedničko</div></div><div class="member-value">50%</div></div>
+  <div class="balance"><small>Od početka obračuna</small><strong>Srki trenutno vodi za 8.157 RSD</strong><p>Računa se samo zajednička potrošnja.</p></div>
+</section>
+<section class="phone">
+  <div class="tag">C · Pregledna tabela</div><h2 class="title">Statistika</h2><div class="period">Septembar 2026 · RSD</div>
+  <div class="total-label">Ukupno ovog meseca</div><div class="total">29.139 <span class="unit">RSD</span></div>
+  <table class="table"><thead><tr><th>Vrsta</th><th>Zajedničko</th><th>Lično</th><th>Ukupno</th></tr></thead><tbody>
+    <tr><td>Pokloni</td><td>9.543</td><td>3.700</td><td>13.243</td></tr><tr><td>Hrana</td><td>8.000</td><td>0</td><td>8.000</td></tr><tr><td>Izlasci</td><td>3.700</td><td>4.196</td><td>7.896</td></tr>
+    <tr><td><b>Ukupno</b></td><td><b>21.243</b></td><td><b>7.896</b></td><td><b>29.139</b></td></tr></tbody></table>
+  <div class="section-title">Članovi domaćinstva</div>
+  <table class="table"><thead><tr><th>Član</th><th>Zajedničko</th><th>Lično</th><th>Ukupno</th></tr></thead><tbody><tr><td>Srki</td><td>14.700</td><td>0</td><td>14.700</td></tr><tr><td>Milica</td><td>6.543</td><td>7.896</td><td>14.439</td></tr></tbody></table>
+  <div class="balance"><small>Kumulativno zajedničko plaćanje</small><strong>Srki je platio 8.157 RSD više</strong><p>Obračun traje od poslednjeg resetovanja.</p></div>
+  <div class="section-title">Potrošnja po kategoriji</div>
+  <div class="cat"><div class="cat-head"><span>Pokloni</span><span>13.243 RSD</span></div><div class="stack"><i class="common" style="width:72%"></i><i class="personal-part" style="width:28%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Hrana</span><span>8.000 RSD</span></div><div class="stack"><i class="common" style="width:60%"></i></div></div>
+  <div class="cat"><div class="cat-head"><span>Izlasci</span><span>7.896 RSD</span></div><div class="stack"><i class="common" style="width:25%"></i><i class="personal-part" style="width:35%"></i></div></div>
+</section>
+</div>
+<p class="foot">Napomena: iznosi i raspodela su primeri radi poređenja vizuelnog stila, nisu podaci iz aplikacije.</p>
+</body></html>

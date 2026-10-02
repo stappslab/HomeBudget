@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HomeBudget all screens preview</title>
+  <style>
+    :root {
+      --bg: #dfe3db;
+      --dark-1: #111c1d;
+      --dark-2: #1a2829;
+      --dark-3: #1f2d2d;
+      --card: #1b2a2a;
+      --muted: #a7b4b0;
+      --soft: #dfe7df;
+      --lime: #a7d7af;
+      --peach: #e1a98c;
+      --sky: #9ec1d9;
+      --line: rgba(255,255,255,.1);
+      --shadow: rgba(14,20,22,.26);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: "Segoe UI", Tahoma, sans-serif; background: var(--bg); color: #f3efe9;
+      padding: 28px 18px 40px;
+    }
+    h1 {
+      max-width: 1180px; margin: 0 auto 8px; color: #1f2727; font-size: 36px; letter-spacing: -.04em;
+    }
+    .intro {
+      max-width: 1180px; margin: 0 auto 20px; color: #586863; font-size: 15px;
+    }
+    .sheet {
+      max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(320px, 1fr)); gap: 18px;
+    }
+    .screen {
+      width: 100%; background: #1a2829; border-radius: 24px; padding: 18px; box-shadow: 0 18px 32px var(--shadow); min-height: 620px;
+    }
+    .screen.pale { background: #f2efe7; color: #1a1d1b; }
+    .label {
+      font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; margin-bottom: 12px; font-weight: 700;
+    }
+    .heading {
+      font-size: 25px; font-weight: 800; letter-spacing: -.04em; margin: 0 0 6px;
+    }
+    .sub {
+      color: var(--muted); font-size: 13px; margin-bottom: 16px;
+    }
+    .screen.pale .sub, .screen.pale .muted, .screen.pale .small { color: #5f6765; }
+    .big-amount {
+      font-size: 42px; line-height: 1; font-weight: 800; letter-spacing: -.06em; margin: 8px 0 6px;
+    }
+    .big-amount small { font-size: 18px; letter-spacing: 0; }
+    .row {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; margin-top: 12px;
+    }
+    .bar {
+      height: 11px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 10px;
+    }
+    .screen.pale .bar { background: rgba(18,28,28,.12); }
+    .bar > i {
+      display: block; width: 64%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a7d7af 0%, #e1a98c 100%);
+    }
+    .avatars { display: flex; gap: 8px; margin: 18px 0 10px; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #1d2a2a; }
+    .avatar.m { background: #d9e4d4; }
+    .avatar.a { background: #b9d4bf; }
+    .avatar.l { background: #a7c3d5; }
+    .list { margin-top: 18px; }
+    .item {
+      display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); color: #edf2ee; font-size: 14px;
+    }
+    .screen.pale .item { border-color: rgba(17,24,25,.12); color: #1b2a2a; }
+    .icon {
+      width: 22px; height: 22px; border-radius: 8px; display: grid; place-items: center; font-size: 11px; background: rgba(255,255,255,.08);
+    }
+    .screen.pale .icon { background: rgba(14,21,22,.08); }
+    .cta-row {
+      display: flex; gap: 10px; margin-top: 18px;
+    }
+    .btn {
+      flex: 1; border-radius: 14px; border: 0; padding: 14px 10px; font-weight: 800; font-size: 14px; cursor: pointer;
+    }
+    .btn.primary { background: #acd0a0; color: #1f2d2d; }
+    .btn.secondary { background: rgba(255,255,255,.08); color: #edf4ef; }
+    .screen.pale .btn.secondary { background: rgba(16,23,24,.08); color: #1a2a2b; }
+    .field {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; height: 40px; margin: 8px 0; padding: 0 12px; color: white; display: flex; align-items: center; font-size: 14px;
+    }
+    .screen.pale .field { background: rgba(18,25,25,.04); border-color: rgba(20,30,29,.08); color: #192626; }
+    .button-box {
+      margin-top: 18px; background: #acd0a0; color: #1d2a2b; border-radius: 14px; font-weight: 800; text-align: center; padding: 14px 10px;
+    }
+    .button-box.alt { background: rgba(255,255,255,.08); color: #edf4ef; }
+    .screen.pale .button-box.alt { background: rgba(18,25,25,.08); color: #1d2a2b; }
+    .stats-grid {
+      height: 120px; display: flex; align-items: end; gap: 8px; margin-top: 20px;
+    }
+    .stats-grid i {
+      display: block; flex: 1; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #9fc6a6 0%, #84af9c 100%);
+    }
+    .stats-grid i:nth-child(2) { background: linear-gradient(180deg, #e6b28e 0%, #cb8b68 100%); }
+    .stats-grid i:nth-child(3) { background: linear-gradient(180deg, #a8c3dd 0%, #7da0bd 100%); }
+    .stats-grid i:nth-child(4) { background: linear-gradient(180deg, #d6d7a7 0%, #b5b58d 100%); }
+  </style>
+</head>
+<body>
+  <h1>HomeBudget · all screens preview</h1>
+  <p class="intro">Jedinstvena premium dark tema po svim ekranima: dashboard, troškovi, dodavanje, statistika, postavke i kategorije.</p>
+
+  <div class="sheet">
+    <div class="screen">
+      <div class="label">01 · Premium dark</div>
+      <h2 class="heading">HomeBudget</h2>
+      <div class="sub">Porodični pregled · Septembar 2026</div>
+      <div class="muted">Ukupno ovog meseca</div>
+      <div class="big-amount">48.250 <small>RSD</small></div>
+      <div class="muted" style="font-size:13px;">Od početka godine · 312.800 RSD</div>
+      <div style="margin-top:18px; background: rgba(255,255,255,.05); border:1px solid var(--line); border-radius:14px; padding:12px 12px 10px;">
+        <div class="row"><span>Porodični budžet</span><span>64%</span></div>
+        <div class="bar"><i></i></div>
+        <div class="small" style="margin-top:10px; font-size:12px; color:var(--muted);">Preostalo 27.750 RSD</div>
+      </div>
+      <div class="avatars">
+        <div class="avatar m">M</div>
+        <div class="avatar a">A</div>
+        <div class="avatar l">L</div>
+      </div>
+      <div class="list">
+        <div class="item"><span class="icon">↗</span><span>Marko · Prodavnica</span><strong>6.420</strong></div>
+        <div class="item"><span class="icon">⌂</span><span>Ana · Stan</span><strong>18.000</strong></div>
+        <div class="item"><span class="icon">✦</span><span>Hrana</span><strong>12.620</strong></div>
+      </div>
+      <div class="cta-row">
+        <button class="btn primary">+ Novi trošak</button>
+        <button class="btn secondary">Statistika</button>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="label">02 · Add expense</div>
+      <h2 class="heading">Novi trošak</h2>
+      <div class="field">Iznos</div>
+      <div class="field">Opis</div>
+      <div class="field">Kategorija</div>
+      <div class="field">RSD</div>
+      <div class="field" style="display:flex; justify-content:space-between; padding-right:6px;">
+        <span>Zajednički trošak</span>
+        <span>✓</span>
+      </div>
+      <div class="button-box">Sačuvaj</div>
+      <div class="button-box alt">Nazad</div>
+    </div>
+
+    <div class="screen">
+      <div class="label">03 · Statistics</div>
+      <h2 class="heading">Statistika</h2>
+      <div class="field">Ovaj mesec</div>
+      <div class="field">Početni datum (dd/mm/yyyy)</div>
+      <div class="field">Krajnji datum (dd/mm/yyyy)</div>
+      <div class="stats-grid">
+        <i style="height:78%"></i>
+        <i style="height:58%"></i>
+        <i style="height:42%"></i>
+        <i style="height:26%"></i>
+      </div>
+      <div style="margin-top:14px; line-height:1.8; font-size:13px; color:#edf1ee;">
+        Stan &nbsp; | &nbsp; 18.000 RSD<br>
+        Hrana &nbsp; | &nbsp; 12.620 RSD<br>
+        Prevoz &nbsp; | &nbsp; 8.300 RSD
+      </div>
+      <div class="button-box alt" style="margin-top:18px;">Nazad</div>
+    </div>
+
+    <div class="screen">
+      <div class="label">04 · Categories</div>
+      <h2 class="heading">Kategorije i budžet</h2>
+      <div class="field">Mesečni ukupni budžet</div>
+      <div class="button-box">Sačuvaj budžet</div>
+      <div class="field">Nova kategorija</div>
+      <div class="button-box alt">Dodaj kategoriju</div>
+      <div style="margin-top:18px; font-size:16px; color:#edf4ef; font-weight:700;">Budžet po kategoriji</div>
+      <div class="field">Kategorija</div>
+      <div class="field">Iznos kategorijskog budžeta</div>
+      <div class="button-box">Sačuvaj kategorijski budžet</div>
+      <div style="margin-top:16px; font-size:15px; line-height:1.9; color:#edf4ef;">
+        • Stan<br>
+        • Hrana<br>
+        • Prevoz
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="label">05 · Members</div>
+      <h2 class="heading">Članovi household-a</h2>
+      <div class="field">Lokalni profil: Marko</div>
+      <div class="field">Ana · odobren</div>
+      <div class="field">Luka · čeka odobrenje</div>
+      <div class="button-box">Osveži članove</div>
+      <div class="button-box alt">Nazad</div>
+    </div>
+
+    <div class="screen">
+      <div class="label">06 · Settings</div>
+      <h2 class="heading">Podešavanja</h2>
+      <div style="margin-top:18px; font-size:15px; color:#edf4ef; font-weight:700;">Podrazumevana valuta</div>
+      <div class="field">RSD</div>
+      <div style="margin-top:16px; font-size:15px; color:#edf4ef; font-weight:700;">Jezik</div>
+      <div class="field">Srpski</div>
+      <div style="margin-top:16px; font-size:15px; color:#edf4ef; font-weight:700;">Tema</div>
+      <div class="field">Tamna</div>
+      <div class="button-box">Sačuvaj valutu</div>
+      <div style="margin-top:16px; font-size:13px; line-height:1.7; color:#edf4ef;">
+        Jezik: srpski / English<br>
+        Tema: svetla / tamna
+      </div>
+    </div>
+  </div>
+</body>
+</html>

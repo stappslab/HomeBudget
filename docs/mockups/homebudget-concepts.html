@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeBudget UI Concepts</title>
+<style>
+:root { font-family: Georgia, 'Times New Roman', serif; color: #27302d; background: #e9e3d8; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px; }
+h1 { max-width: 1180px; margin: 0 auto 8px; font-size: 34px; }
+.intro { max-width: 1180px; margin: 0 auto 26px; color: #5b625d; }
+.grid { max-width: 1180px; margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.concept { min-height: 700px; overflow: hidden; border-radius: 22px; box-shadow: 0 18px 45px rgba(49, 47, 38, .14); position: relative; }
+.concept h2 { margin: 0; font-size: 21px; }
+.concept .tag { font: 11px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; opacity: .72; margin-bottom: 8px; }
+.content { padding: 24px; }
+.amount { font-size: 39px; line-height: 1.05; margin: 22px 0 6px; }
+.muted { opacity: .68; font: 13px Arial, sans-serif; }
+.card { border-radius: 16px; padding: 16px; margin-top: 18px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: inline-grid; place-items: center; font: 14px Arial, sans-serif; font-weight: bold; }
+.people { display: flex; gap: 6px; margin-top: 18px; }
+.bar { height: 9px; border-radius: 9px; margin-top: 12px; overflow: hidden; }
+.bar i { display: block; width: 64%; height: 100%; border-radius: inherit; }
+.expense { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid currentColor; opacity: .8; }
+.expense:last-child { border-bottom: 0; }
+.icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; font: 16px Arial, sans-serif; }
+.bottom { position: absolute; left: 20px; right: 20px; bottom: 18px; display: flex; gap: 10px; }
+.bottom button { border: 0; padding: 13px 15px; border-radius: 13px; flex: 1; font-weight: bold; cursor: pointer; }
+.one { background: #f8f3ea; color: #31463e; }
+.one header { background: #315348; color: #f8f3ea; padding: 24px; }
+.one .content { background: #f8f3ea; min-height: 570px; }
+.one .card { background: #e5eee6; }
+.one .bar { background: #c9d8cc; }
+.one .bar i { background: #d98768; }
+.one .avatar { background: #d98768; color: white; }
+.one .avatar:nth-child(2) { background: #879c79; }
+.one .avatar:nth-child(3) { background: #d5b96f; }
+.one .icon { background: #e1eadc; }
+.one .bottom button:first-child { background: #d98768; color: white; }
+.one .bottom button:last-child { background: #d9e3d7; color: #315348; }
+.two { background: #fff8ef; color: #3a332c; }
+.two header { padding: 24px; background: #ffcc67; }
+.two .content { min-height: 570px; }
+.two .card { background: #fff; border: 2px solid #f2dfc7; }
+.two .bar { background: #f0dfcb; }
+.two .bar i { background: #66a99b; }
+.two .avatar { background: #ef806e; color: white; }
+.two .avatar:nth-child(2) { background: #66a99b; }
+.two .avatar:nth-child(3) { background: #8877bd; }
+.two .icon { background: #ffe5ad; }
+.two .bottom button:first-child { background: #ef806e; color: white; }
+.two .bottom button:last-child { background: #66a99b; color: white; }
+.three { background: #151c1c; color: #edf1e8; }
+.three header { padding: 24px; background: #202b2a; }
+.three .muted { color: #aebbb0; }
+.three .content { min-height: 570px; }
+.three .card { background: #202b2a; border: 1px solid #344441; }
+.three .bar { background: #33413e; }
+.three .bar i { background: #9cc7a8; }
+.three .avatar { background: #d68467; color: #151c1c; }
+.three .avatar:nth-child(2) { background: #9cc7a8; }
+.three .avatar:nth-child(3) { background: #e0bd67; }
+.three .icon { background: #2b3b37; }
+.three .bottom button:first-child { background: #9cc7a8; color: #151c1c; }
+.three .bottom button:last-child { background: #31423e; color: #edf1e8; }
+@media (max-width: 900px) { body { padding: 18px; } .grid { grid-template-columns: 1fr; max-width: 430px; } }
+</style>
+</head>
+<body>
+<h1>HomeBudget: tri pravca dizajna</h1>
+<p class="intro">Isti dashboard, tri različita karaktera. Predlozi su namenjeni Android ekranu, ali se mogu prilagoditi desktop prikazu.</p>
+<div class="grid">
+<section class="concept one">
+<header><div class="tag">01 · Topao porodični</div><h2>Naš household</h2><div class="people"><span class="avatar">M</span><span class="avatar">A</span><span class="avatar">L</span><span class="muted">+ 1 član</span></div></header>
+<div class="content"><div class="muted">Potrošnja ovog meseca</div><div class="amount">48.250 <small>RSD</small></div><div class="muted">Od početka godine · 312.800 RSD</div><div class="card"><div class="row"><b>Porodični budžet</b><span>64%</span></div><div class="bar"><i></i></div><div class="muted" style="margin-top:9px">Preostalo 27.750 RSD</div></div><div class="card"><div class="row"><b>Poslednji troškovi</b><span>›</span></div><div class="expense"><span class="icon">⌂</span><span>Stan</span><b>18.000 RSD</b></div><div class="expense"><span class="icon">●</span><span>Prodavnica</span><b>6.420 RSD</b></div></div></div>
+<div class="bottom"><button>+ Dodaj trošak</button><button>Pregled</button></div>
+</section>
+<section class="concept two">
+<header><div class="tag">02 · Razigrani finansijski</div><h2>Zajedno držimo pregled</h2><div class="amount">48.250 <small>RSD</small></div><div class="muted">Ovaj mesec</div></header>
+<div class="content"><div class="card"><div class="row"><b>Budžet ide dobro</b><span>♡</span></div><div class="bar"><i></i></div><div class="muted" style="margin-top:9px">Još 27.750 RSD do limita</div></div><div class="people"><span class="avatar">M</span><span class="avatar">A</span><span class="avatar">L</span><span class="muted">Ko je trošio ovog meseca</span></div><div class="card"><div class="row"><b>Kategorije</b><span class="muted">Ovaj mesec</span></div><div class="expense"><span class="icon">◒</span><span>Stan</span><b>18.000</b></div><div class="expense"><span class="icon">✦</span><span>Hrana</span><b>12.620</b></div><div class="expense"><span class="icon">↗</span><span>Prevoz</span><b>8.300</b></div></div></div>
+<div class="bottom"><button>+ Unesi trošak</button><button>Statistika</button></div>
+</section>
+<section class="concept three">
+<header><div class="tag">03 · Moderan premium</div><h2>HomeBudget</h2><div class="muted">Porodični pregled · Septembar 2026</div></header>
+<div class="content"><div class="muted">Ukupno ovog meseca</div><div class="amount">48.250 <small>RSD</small></div><div class="card"><div class="row"><b>Potrošnja po kategorijama</b><span class="muted">›</span></div><div style="height:100px;display:flex;align-items:end;gap:10px;padding-top:16px"><i style="height:82%;background:#9cc7a8;flex:1;border-radius:8px 8px 2px 2px"></i><i style="height:58%;background:#d68467;flex:1;border-radius:8px 8px 2px 2px"></i><i style="height:40%;background:#e0bd67;flex:1;border-radius:8px 8px 2px 2px"></i><i style="height:25%;background:#718f9c;flex:1;border-radius:8px 8px 2px 2px"></i></div></div><div class="card"><div class="row"><b>Aktivnost household-a</b><span class="muted">danas</span></div><div class="expense"><span class="icon">↗</span><span>Marko · Prodavnica</span><b>6.420</b></div><div class="expense"><span class="icon">⌂</span><span>Ana · Stan</span><b>18.000</b></div></div></div>
+<div class="bottom"><button>+ Novi trošak</button><button>Dashboard</button></div>
+</section>
+</div>
+</body>
+</html>

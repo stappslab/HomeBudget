@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.sqlite3
+*.db
+.buildozer/
+bin/
+.env
+.vscode/
+homebudget-v2-debug.apk
+mobile_flutter/android/app/google-services.json
