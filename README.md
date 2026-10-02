@@ -1,46 +1,47 @@
-# HomeBudget 2.0
+# HomeBudget
 
-Shared household expense tracking for Android. Firebase Authentication identifies
-members and Cloud Firestore stores households, budgets and expenses. Firestore's
-offline cache handles temporary disconnections. Amounts are stored as integer
-minor units; foreign-currency expenses keep their original amount and use a
-user-entered conversion rate for totals in the household's main currency.
+HomeBudget is a Flutter app for managing a shared household budget on Android. Members can record expenses, set category limits, and follow spending together. Firebase Authentication and Cloud Firestore keep the household in sync across devices, while Firestore's offline cache supports temporary loss of connectivity.
 
-The app includes category pocket budgets, searchable and editable expenses,
-six-month spending insights, and an optional device PIN and biometric lock.
-The local-only household, SQLite database and its backup/import flow have been
-removed. Device lock settings remain on the phone in encrypted storage.
+## Features
 
-## Development
+- **Shared households:** create a household, invite members with a single-use code, approve requests, and manage membership.
+- **Expenses:** add, search, edit, and filter shared or personal expenses. Each expense retains its original amount and currency.
+- **Multiple currencies:** enter a conversion rate when recording an expense in a currency other than the household's main currency. Household totals use the converted amount.
+- **Budgets and insights:** set a monthly limit and category budgets, view spending pockets, and review a six-month trend.
+- **Device security:** optional PIN and biometric lock. The device PIN is never stored in Firestore.
+- **Appearance and guidance:** light and dark themes and an in-app walkthrough.
 
-```bash
-flutter pub get
-flutter analyze
-flutter test
-flutter build apk --debug
-cp build/app/outputs/flutter-apk/app-debug.apk "/mnt/c/Dev/Expense App/homebudget-v2-debug.apk"
-```
+## Getting started
 
-## Production Android release
+The Flutter application is in [`mobile_flutter/`](mobile_flutter/). To run it, you need a current Flutter SDK, the Android SDK, and a Firebase project with Email/Password Authentication and Cloud Firestore enabled.
 
-The current application ID remains `com.example.homebudget_flutter` so this APK
-updates the version already installed on your phone. The former SQLite household
-is no longer opened by the app; cloud households remain in Firestore.
-Choose a permanent unique ID before the first public store release; changing it
-later creates a separate Android app, so it must be paired with a data migration.
-Create a private upload key once, outside source control, then create `android/key.properties` from
-`android/key.properties.example` with the real values.
+1. Register the Android app in Firebase using the application ID in [`mobile_flutter/android/app/build.gradle.kts`](mobile_flutter/android/app/build.gradle.kts).
+2. Place the Firebase Android configuration at `mobile_flutter/android/app/google-services.json` and deploy [`mobile_flutter/firestore.rules`](mobile_flutter/firestore.rules) to your Firebase project. Review the rules and project ID before deployment.
+3. From `mobile_flutter`, run:
 
-```bash
-keytool -genkeypair -v -keystore ~/homebudget-upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
-flutter build appbundle --release
-flutter build apk --release --split-per-abi
-```
+   ```bash
+   flutter pub get
+   flutter analyze
+   flutter test
+   flutter run
+   ```
 
-The release configuration enables R8 and Android resource shrinking. The split
-APK command creates a smaller APK per device architecture; use the `arm64-v8a`
-APK for most current Android phones.
+For Android build and signing details, see the [Flutter project guide](mobile_flutter/README.md). Firestore rule tests are documented in [`mobile_flutter/firebase_rules_test/README.md`](mobile_flutter/firebase_rules_test/README.md).
 
-Android cloud backup and cleartext network traffic are disabled in the
-production manifest. Household data is stored in Firestore; the device PIN
-verifier and theme preferences stay on the phone.
+## How data is handled
+
+Households, members, categories, budgets, and expenses are stored in Cloud Firestore. Access is controlled by Firestore Security Rules and verified Firebase accounts. App preferences and the optional device lock remain on the device. Firestore can cache household data locally for offline use and synchronize pending changes when connectivity returns.
+
+Monetary amounts are stored as integer minor units to avoid floating-point rounding in expense records. For a foreign-currency expense, the app records the original amount and the conversion rate entered by the user.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| [`mobile_flutter/lib/app/`](mobile_flutter/lib/app/) | Screens, navigation, themes, and forms |
+| [`mobile_flutter/lib/data/`](mobile_flutter/lib/data/) | Firebase services, cloud totals, and device settings |
+| [`mobile_flutter/lib/utils/`](mobile_flutter/lib/utils/) | Money parsing and formatting |
+| [`mobile_flutter/test/`](mobile_flutter/test/) | Flutter tests |
+| [`mobile_flutter/firebase_rules_test/`](mobile_flutter/firebase_rules_test/) | Firestore Security Rules tests |
+
+HomeBudget is currently distributed as an Android build from source; it is not listed on Google Play.
