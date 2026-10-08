@@ -10,6 +10,12 @@ service cloud.firestore {
       return signedIn() && request.auth.token.email_verified == true;
     }
 
+    function validText(value, maximum, optional) {
+      return value is string && value.size() <= maximum
+        && (optional || value.trim().size() > 0)
+        && value.matches('^[^\\x00-\\x1F\\x7F]*$');
+    }
+
     function memberPath(householdId, userId) {
       return /databases/$(database)/documents/households/$(householdId)/members/$(userId);
     }
@@ -48,15 +54,162 @@ service cloud.firestore {
             && data.baseAmountCents * 1000000 > data.amountCents * data.rateToBaseMicros - 500000));
     }
 
+    function validExpense(data) {
+      return data.keys().hasOnly(['authorId', 'authorName', 'amountCents',
+          'baseAmountCents', 'rateToBaseMicros', 'currency', 'categoryId',
+          'description', 'isShared', 'expenseDate', 'createdAt', 'updatedAt',
+          'recurringId', 'recurringMonth'])
+        && data.keys().hasAll(['authorId', 'authorName', 'amountCents',
+          'baseAmountCents', 'rateToBaseMicros', 'currency', 'categoryId',
+          'description', 'isShared', 'expenseDate', 'createdAt', 'updatedAt'])
+        && data.authorId is string && data.authorId.size() > 0
+        && data.authorName is string && data.authorName.size() <= 100
+        && data.categoryId is string && data.categoryId.size() > 0
+        && data.categoryId.size() <= 128
+        && data.currency is string && data.currency.matches('^[A-Z]{3}$')
+        && validText(data.description, 500, true)
+        && data.isShared is bool && data.expenseDate is timestamp
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && validMoneyFields(data);
+    }
+
+    function recurringTemplatePath(householdId, recurringId) {
+      return /databases/$(database)/documents/households/$(householdId)/recurringTemplates/$(recurringId);
+    }
+
+    function recurringOccurrencePath(householdId, recurringId, month) {
+      return /databases/$(database)/documents/households/$(householdId)/recurringOccurrences/$(recurringId + '_' + month);
+    }
+
+    function expensePath(householdId, expenseId) {
+      return /databases/$(database)/documents/households/$(householdId)/expenses/$(expenseId);
+    }
+
+    function validMonth(month) {
+      return month is string && month.matches('^[0-9]{4}-(0[1-9]|1[0-2])$');
+    }
+
+    function validRecurringTemplate(data) {
+      return data.keys().hasOnly(['name', 'categoryId', 'amountCents', 'currency',
+          'dueDay', 'graceDays', 'isShared', 'startMonth', 'archived', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['name', 'categoryId', 'amountCents', 'currency',
+          'dueDay', 'graceDays', 'isShared', 'startMonth', 'archived'])
+        && validText(data.name, 60, false)
+        && data.categoryId is string && data.categoryId.size() > 0
+        && data.currency is string && data.currency.size() == 3
+        && data.amountCents is int && data.amountCents > 0 && data.amountCents <= 1000000000
+        && data.dueDay is int && (data.dueDay == 0 || (data.dueDay >= 1 && data.dueDay <= 28))
+        && data.graceDays is int && data.graceDays >= 0 && data.graceDays <= 14
+        && data.isShared is bool && data.archived is bool && validMonth(data.startMonth);
+    }
+
+    function hasRecurring(data) {
+      return data.keys().hasAny(['recurringId', 'recurringMonth']);
+    }
+
+    function currentMonth() {
+      return string(request.time.year()) + '-' + (request.time.month() < 10 ? '0' : '') + string(request.time.month());
+    }
+
+    function validPeriod(data) {
+      return data.keys().hasOnly(['version', 'recurringId', 'month', 'name',
+          'expectedAmountCents', 'categoryId', 'currency', 'isShared',
+          'dueDay', 'graceDays', 'createdAt', 'updatedAt'])
+        && data.version == 2 && data.recurringId is string
+        && validMonth(data.month) && validText(data.name, 60, false)
+        && data.expectedAmountCents is int && data.expectedAmountCents > 0
+        && data.expectedAmountCents <= 1000000000
+        && data.categoryId is string && data.categoryId.size() > 0
+        && data.currency in ['RSD', 'EUR', 'USD', 'BAM', 'CHF']
+        && data.isShared is bool && data.dueDay is int
+        && data.dueDay >= 0 && data.dueDay <= 28
+        && data.graceDays is int && data.graceDays >= 0 && data.graceDays <= 14
+        && data.createdAt is timestamp && data.updatedAt is timestamp;
+    }
+
+    function periodMatchesTemplate(householdId, data) {
+      let template = get(recurringTemplatePath(householdId, data.recurringId)).data;
+      return !template.archived && template.startMonth <= data.month && data.month <= currentMonth()
+        && data.name == template.name && data.expectedAmountCents == template.amountCents
+        && data.categoryId == template.categoryId && data.currency == template.currency
+        && data.isShared == template.isShared && data.dueDay == template.dueDay
+        && data.graceDays == template.graceDays;
+    }
+
+    function validLegacyMigration(householdId, old, data) {
+      let template = get(recurringTemplatePath(householdId, data.recurringId)).data;
+      let paymentPath = expensePath(householdId, old.expenseId);
+      let payment = exists(paymentPath) ? get(paymentPath).data : template;
+      return old.get('version', 1) == 1
+        && data.recurringId == old.recurringId && data.month == old.month
+        && template.startMonth <= data.month && data.name == template.name
+        && data.categoryId == payment.categoryId && data.currency == payment.currency
+        && data.isShared == payment.isShared
+        && data.expectedAmountCents == (payment.currency == template.currency
+          ? template.amountCents : payment.amountCents)
+        && data.dueDay == template.dueDay && data.graceDays == template.graceDays
+        && data.createdAt == old.get('createdAt', request.time);
+    }
+
+    function validLegacyOccurrence(householdId, data) {
+      let template = get(recurringTemplatePath(householdId, data.recurringId)).data;
+      let payment = getAfter(expensePath(householdId, data.expenseId)).data;
+      return data.keys().hasOnly(['recurringId', 'month', 'expenseId', 'authorId', 'createdAt'])
+        && validMonth(data.month) && data.month <= currentMonth() && data.createdAt is timestamp
+        && data.authorId == request.auth.uid && payment.authorId == data.authorId
+        && payment.recurringId == data.recurringId && payment.recurringMonth == data.month
+        && !template.archived && template.startMonth <= data.month
+        && payment.categoryId == template.categoryId && payment.currency == template.currency
+        && payment.isShared == template.isShared;
+    }
+
+    function validExpenseLink(householdId, expenseId, data, oldData) {
+      let unchanged = oldData != null
+        && oldData.get('recurringId', '') == data.get('recurringId', '')
+        && oldData.get('recurringMonth', '') == data.get('recurringMonth', '')
+        && oldData.categoryId == data.categoryId && oldData.currency == data.currency
+        && oldData.isShared == data.isShared;
+      return !hasRecurring(data) ||
+        (data.keys().hasAll(['recurringId', 'recurringMonth'])
+          && data.recurringId is string && data.recurringId.size() > 0
+          && validMonth(data.recurringMonth)
+          && existsAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth))
+          && (unchanged || (
+            getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.get('version', 1) == 2
+            && getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.categoryId == data.categoryId
+            && getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.currency == data.currency
+            && getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.isShared == data.isShared)
+          || (getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.get('version', 1) == 1
+            && getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data.expenseId == expenseId
+            && validLegacyOccurrence(householdId, getAfter(recurringOccurrencePath(householdId, data.recurringId, data.recurringMonth)).data))));
+    }
+
     match /users/{userId} {
       allow get: if verified() && request.auth.uid == userId;
       allow create: if verified() && request.auth.uid == userId
         && request.resource.data.keys().hasOnly(['displayName', 'email', 'createdAt'])
-        && request.resource.data.displayName is string
+        && validText(request.resource.data.displayName, 60, false)
         && request.resource.data.email == request.auth.token.email;
       allow update: if verified() && request.auth.uid == userId
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName'])
+        && validText(request.resource.data.displayName, 60, false);
       allow delete: if false;
+    }
+
+    match /accountDeletionRequests/{userId} {
+      allow get: if verified() && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if verified() && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+          'uid', 'email', 'householdId', 'requestedAt', 'status'])
+        && request.resource.data.keys().hasAll([
+          'uid', 'email', 'requestedAt', 'status'])
+        && request.resource.data.uid == userId
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.get('householdId', '') is string
+        && request.resource.data.requestedAt is timestamp
+        && request.resource.data.status == 'pending';
+      allow update, delete: if false;
     }
 
     match /membershipIndex/{userId} {
@@ -79,11 +232,12 @@ service cloud.firestore {
       allow list: if false;
       allow create: if verified()
         && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.name is string
+        && validText(request.resource.data.name, 80, false)
         && request.resource.data.baseCurrency is string
         && existsAfter(memberPath(householdId, request.auth.uid));
       allow update: if isOwner(householdId)
         && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'baseCurrency', 'updatedAt'])
+          && validText(request.resource.data.name, 80, false)
           || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerId', 'updatedAt'])
             && request.resource.data.ownerId != request.auth.uid
             && exists(indexPath(request.resource.data.ownerId))
@@ -98,11 +252,13 @@ service cloud.firestore {
         // The creator writes their own owner record together with the household.
         allow create: if (verified() && userId == request.auth.uid
           && request.resource.data.role == 'owner'
+          && validText(request.resource.data.displayName, 60, false)
           && request.resource.data.status == 'active'
           && getAfter(/databases/$(database)/documents/households/$(householdId)).data.ownerId == request.auth.uid)
           || (isOwner(householdId)
           && request.resource.data.uid == userId
           && request.resource.data.role == 'member'
+          && validText(request.resource.data.displayName, 60, false)
           && request.resource.data.status == 'active'
           && exists(/databases/$(database)/documents/households/$(householdId)/joinRequests/$(userId)));
         // The owner approves a pending join request. Members cannot promote themselves.
@@ -131,7 +287,7 @@ service cloud.firestore {
           && !exists(indexPath(userId))
           && request.resource.data.keys().hasOnly(['uid', 'displayName', 'inviteCode', 'requestedAt'])
           && request.resource.data.uid == request.auth.uid
-          && request.resource.data.displayName is string
+          && validText(request.resource.data.displayName, 60, false)
           && getAfter(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.householdId == householdId
           && getAfter(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.redeemedBy == request.auth.uid;
         allow delete: if isOwner(householdId) || (verified() && userId == request.auth.uid);
@@ -141,16 +297,12 @@ service cloud.firestore {
       match /categories/{categoryId} {
         allow read: if isMember(householdId);
         allow create: if isOwnerAfter(householdId)
-          && request.resource.data.name is string
-          && request.resource.data.name.size() > 0
-          && request.resource.data.name.size() <= 40
+          && validText(request.resource.data.name, 40, false)
           && request.resource.data.archived is bool;
         allow update: if isOwner(householdId)
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['name', 'archived'])
-          && request.resource.data.name is string
-          && request.resource.data.name.size() > 0
-          && request.resource.data.name.size() <= 40
+          && validText(request.resource.data.name, 40, false)
           && request.resource.data.archived is bool;
         allow delete: if false;
       }
@@ -160,6 +312,7 @@ service cloud.firestore {
         allow create, update: if isOwner(householdId)
           && request.resource.data.amountCents is int
           && request.resource.data.amountCents >= 0
+          && request.resource.data.amountCents <= 1000000000
           && request.resource.data.currency is string;
         allow delete: if isOwner(householdId);
       }
@@ -175,17 +328,49 @@ service cloud.firestore {
         allow read: if isMember(householdId);
         allow create: if isMember(householdId)
           && request.resource.data.authorId == request.auth.uid
-          && request.resource.data.authorName is string
-          && request.resource.data.categoryId is string
-          && request.resource.data.currency is string
-          && request.resource.data.isShared is bool
-          && request.resource.data.expenseDate is timestamp
-          && validMoneyFields(request.resource.data);
+          && validExpense(request.resource.data)
+          && validExpenseLink(householdId, expenseId, request.resource.data, null);
         allow update: if isMember(householdId)
           && resource.data.authorId == request.auth.uid
           && request.resource.data.authorId == resource.data.authorId
-          && validMoneyFields(request.resource.data);
+          && request.resource.data.authorName == resource.data.authorName
+          && request.resource.data.createdAt == resource.data.createdAt
+          && validExpense(request.resource.data)
+          && validExpenseLink(householdId, expenseId, request.resource.data, resource.data);
         allow delete: if isMember(householdId) && resource.data.authorId == request.auth.uid;
+      }
+
+      match /recurringTemplates/{recurringId} {
+        allow read: if isMember(householdId);
+        allow create: if isOwner(householdId)
+          && validRecurringTemplate(request.resource.data)
+          && request.resource.data.archived == false;
+        allow update: if isOwner(householdId)
+          && validRecurringTemplate(request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'name', 'categoryId', 'amountCents', 'currency', 'dueDay',
+            'graceDays', 'isShared', 'archived', 'updatedAt']);
+        allow delete: if false;
+      }
+
+      match /recurringOccurrences/{occurrenceId} {
+        allow read: if isMember(householdId);
+        allow create: if isMember(householdId)
+          && occurrenceId == request.resource.data.recurringId + '_' + request.resource.data.month
+          && ((validPeriod(request.resource.data) && periodMatchesTemplate(householdId, request.resource.data))
+            || (request.resource.data.get('version', 1) == 1 && validLegacyOccurrence(householdId, request.resource.data)));
+        allow update: if isMember(householdId) && validPeriod(request.resource.data)
+          && occurrenceId == request.resource.data.recurringId + '_' + request.resource.data.month
+          && ((resource.data.get('version', 1) == 1 && validLegacyMigration(householdId, resource.data, request.resource.data))
+            || (resource.data.get('version', 1) == 2 && isOwner(householdId)
+              && resource.data.month == currentMonth()
+              && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['name', 'categoryId', 'updatedAt'])
+              && exists(/databases/$(database)/documents/households/$(householdId)/categories/$(request.resource.data.categoryId))));
+        // Legacy clients may clean up a single-payment marker after removing its expense.
+        allow delete: if isMember(householdId) && resource.data.get('version', 1) == 1
+          && resource.data.authorId == request.auth.uid
+          && !existsAfter(expensePath(householdId, resource.data.expenseId));
       }
     }
 

@@ -11,6 +11,37 @@ class CloudTotals {
   final int unconvertedCount;
 }
 
+class MemberSharedSpending {
+  const MemberSharedSpending({required this.name, required this.monthlyCents,
+    required this.runningCents});
+  final String name;
+  final int monthlyCents, runningCents;
+}
+
+Map<String, MemberSharedSpending> calculateMemberSharedSpending(
+    List<CloudExpense> expenses, DateTime now, {DateTime? sharedResetAt}) {
+  final monthly = <String, int>{};
+  final running = <String, int>{};
+  final names = <String, String>{};
+  for (final expense in expenses) {
+    final base = expense.baseAmountCents;
+    if (!expense.isShared || base == null || expense.expenseDate.isAfter(now)) continue;
+    names[expense.authorId] = expense.authorName.trim().isEmpty ?
+      'Household member' : expense.authorName.trim();
+    if (expense.expenseDate.year == now.year && expense.expenseDate.month == now.month) {
+      monthly.update(expense.authorId, (value) => value + base, ifAbsent: () => base);
+    }
+    if (!expense.expenseDate.isBefore(sharedResetAt ?? DateTime.utc(2000))) {
+      running.update(expense.authorId, (value) => value + base, ifAbsent: () => base);
+    }
+  }
+  return {
+    for (final uid in names.keys)
+      uid: MemberSharedSpending(name: names[uid]!,
+        monthlyCents: monthly[uid] ?? 0, runningCents: running[uid] ?? 0),
+  };
+}
+
 CloudTotals calculateCloudTotals(List<CloudExpense> expenses, DateTime now,
     {DateTime? sharedResetAt}) {
   var monthly = 0;

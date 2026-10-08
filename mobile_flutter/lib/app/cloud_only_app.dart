@@ -24,6 +24,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
   final navigatorKey = GlobalKey<NavigatorState>();
   final localAuth = LocalAuthentication();
   FirebaseServices? services;
+  CloudHousehold? savedHousehold;
   bool darkTheme = true;
   bool biometricLock = false;
   bool pinEnabled = false;
@@ -38,8 +39,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadPreferences();
-    _prepareCloud();
+    _bootstrap();
   }
 
   @override
@@ -136,9 +136,24 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
       services ??= FirebaseServices();
     } catch (failure) {
       if (mounted) setState(() => error = 'Cloud connection could not start: $failure');
-    } finally {
-      if (mounted) setState(() => checkingAccount = false);
     }
+  }
+
+  Future<void> _bootstrap() async {
+    await _loadPreferences();
+    await _prepareCloud();
+    if (services?.currentUser?.emailVerified == true) {
+      try {
+        savedHousehold = await services!.currentHousehold()
+          .timeout(const Duration(seconds: 15));
+      } catch (failure) {
+        if (mounted) {
+          setState(() => error = 'Household could not load. Tap to retry: $failure');
+        }
+      }
+    }
+    if (!mounted) return;
+    setState(() => checkingAccount = false);
   }
 
   Future<void> _openCloud() async {
@@ -146,7 +161,9 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
     setState(() { busy = true; error = null; });
     try {
       if (services == null) await _prepareCloud();
-      services ??= FirebaseServices();
+      if (services == null) {
+        throw StateError('Cloud connection is unavailable. Check your internet connection and try again.');
+      }
       if (!mounted) return;
       setState(() => busy = false);
       if (services!.currentUser?.emailVerified != true) {
@@ -154,12 +171,19 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
           MaterialPageRoute(builder: (_) => FirebaseAccountPage(services: services!)));
         if (signedIn != true || !mounted) return;
       }
-      final household = await Navigator.of(navigatorKey.currentContext!).push<CloudHousehold>(
-        MaterialPageRoute(builder: (_) => FirebaseHouseholdSetupPage(
-          services: services!)));
+      var household = await services!.currentHousehold()
+        .timeout(const Duration(seconds: 15));
+      if (household == null && mounted) {
+        setState(() => savedHousehold = null);
+        household = await Navigator.of(navigatorKey.currentContext!).push<CloudHousehold>(
+          MaterialPageRoute(builder: (_) => FirebaseHouseholdSetupPage(
+            services: services!)));
+      }
       if (household == null || !mounted) return;
+      final selectedHousehold = household;
+      setState(() => savedHousehold = selectedHousehold);
       await Navigator.of(navigatorKey.currentContext!).push<void>(MaterialPageRoute(builder: (_) =>
-        CloudHouseholdPage(services: services!, household: household,
+        CloudHouseholdPage(services: services!, household: selectedHousehold,
           darkTheme: darkTheme, biometricLock: biometricLock, pinEnabled: pinEnabled,
           onThemeChanged: (value) async {
             await widget.settings.setDarkThemeEnabled(value);
@@ -173,6 +197,18 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
           onShareStarted: () => sharing = true,
           onShareFinished: () => sharing = false,
         )));
+      if (!mounted) return;
+      if (services!.currentUser?.emailVerified == true) {
+        try {
+          final current = await services!.currentHousehold()
+            .timeout(const Duration(seconds: 15));
+          if (mounted) setState(() => savedHousehold = current);
+        } catch (_) {
+          // Keep the last known household available for a manual retry.
+        }
+      } else {
+        setState(() => savedHousehold = null);
+      }
     } catch (failure) {
       if (mounted) setState(() => error = 'Cloud connection could not start: $failure');
     } finally {
@@ -203,14 +239,24 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
               textAlign: TextAlign.center),
             const SizedBox(height: 12),
           ],
+          if (savedHousehold != null) ...[
+            Text(savedHousehold!.name, textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+          ],
           FilledButton.icon(onPressed: busy || checkingAccount ? null : _openCloud,
             icon: const Icon(Icons.cloud_outlined),
             label: Text(busy || checkingAccount ? 'Connecting…' :
-              services?.currentUser?.emailVerified == true ? 'Choose household' : 'Sign in or create an account')),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(onPressed: busy || checkingAccount ? null : _openCloud,
-            icon: const Icon(Icons.group_add_outlined),
-            label: const Text('Join with an invite code')),
+              savedHousehold != null ? 'Open household' :
+              services?.currentUser?.emailVerified == true ? 'Create or join a household' :
+              'Sign in or create an account')),
+          if (services?.currentUser?.emailVerified == true) ...[
+            const SizedBox(height: 12),
+            TextButton(onPressed: busy || checkingAccount ? null : () async {
+              await services!.signOut();
+              if (mounted) setState(() => savedHousehold = null);
+            }, child: const Text('Sign out')),
+          ],
           const SizedBox(height: 24),
           Card(color: Theme.of(context).colorScheme.primaryContainer,
             child: ListTile(leading: const Icon(Icons.school_outlined),

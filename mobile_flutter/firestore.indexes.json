@@ -1,0 +1,30 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isShared", "order": "ASCENDING"},
+        {"fieldPath": "expenseDate", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isShared", "order": "ASCENDING"},
+        {"fieldPath": "authorId", "order": "ASCENDING"},
+        {"fieldPath": "expenseDate", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "members",
+      "fieldPath": "uid",
+      "indexes": [
+        {"order": "ASCENDING", "queryScope": "COLLECTION_GROUP"}
+      ]
+    }
+  ]
+}

@@ -23,4 +23,20 @@ void main() {
     expect(find.text('Groceries budget'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('invalid budget stays open and explains the error', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: Builder(
+      builder: (context) => TextButton(onPressed: () => showBudgetAmountDialog(context,
+        title: 'Monthly', currency: 'RSD'), child: const Text('Set budget')),
+    ))));
+
+    await tester.tap(find.text('Set budget'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), 'not a number');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Monthly budget'), findsOneWidget);
+    expect(find.text('Enter an amount up to 10,000,000.00.'), findsOneWidget);
+  });
 }

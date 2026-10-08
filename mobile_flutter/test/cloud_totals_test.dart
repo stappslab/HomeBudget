@@ -36,4 +36,23 @@ void main() {
     expect(totals.sharedCents, 3000);
     expect(totals.monthlyCents, 7000);
   });
+
+  test('shared spending compares members for this month and since reset', () {
+    CloudExpense by(String uid, String name, int cents, DateTime date,
+        {bool shared = true}) => CloudExpense(
+      id: '$uid-${date.day}', authorId: uid, authorName: name,
+      amountCents: cents, baseAmountCents: cents, currency: 'RSD',
+      categoryId: 'food', description: '', isShared: shared, expenseDate: date);
+    final result = calculateMemberSharedSpending([
+      by('alice', 'Alice', 1000, DateTime(2026, 9, 10)),
+      by('alice', 'Alice', 2000, DateTime(2026, 9, 25)),
+      by('alice', 'Alice', 3000, DateTime(2026, 10, 2)),
+      by('bob', 'Bob', 4500, DateTime(2026, 10, 3)),
+      by('bob', 'Bob', 9000, DateTime(2026, 10, 4), shared: false),
+    ], DateTime(2026, 10, 15), sharedResetAt: DateTime(2026, 9, 20));
+    expect(result['alice']?.monthlyCents, 3000);
+    expect(result['alice']?.runningCents, 5000);
+    expect(result['bob']?.monthlyCents, 4500);
+    expect(result['bob']?.runningCents, 4500);
+  });
 }
