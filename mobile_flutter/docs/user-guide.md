@@ -1,4 +1,4 @@
-# Using HomeBudget
+# Using Home Budget
 
 ## Help wherever you are
 

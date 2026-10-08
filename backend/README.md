@@ -1,5 +1,9 @@
 # HomeBudget backend
 
+Historical prototype retained for reference. The current Android application uses Firebase and does not call this backend.
+
+Do not expose this prototype to the internet: it lacks token authentication, stores its household PIN without a password hash, and trusts client-supplied profile IDs. Its endpoints do not provide production authorization.
+
 FastAPI API with a local SQLite database for the first MVP.
 
 ## Run on Windows

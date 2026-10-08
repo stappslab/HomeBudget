@@ -2510,10 +2510,10 @@ class _CloudHouseholdPageState extends State<CloudHouseholdPage> {
                     await SharePlus.instance.share(
                       ShareParams(
                         text:
-                            'Join my HomeBudget household with this one-time code: $code\n'
-                            'Open HomeBudget, choose Join with an invite code, and enter it. '
+                            'Join my Home Budget household with this one-time code: $code\n'
+                            'Open Home Budget, choose Join with an invite code, and enter it. '
                             'The code expires in 24 hours.',
-                        subject: 'HomeBudget household invitation',
+                        subject: 'Home Budget household invitation',
                       ),
                     );
                   } catch (error) {

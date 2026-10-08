@@ -1,4 +1,4 @@
-# HomeBudget for Android
+# Home Budget for Android
 
 This directory contains the Flutter application. For an overview of its features and data model, see the [repository README](../README.md).
 

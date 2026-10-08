@@ -64,7 +64,7 @@ class _FirebaseAccountPageState extends State<FirebaseAccountPage> {
                   Text(
                     registering
                         ? 'Keep your household in sync'
-                        : 'Sign in to HomeBudget',
+                        : 'Sign in to Home Budget',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),

@@ -1,6 +1,6 @@
-# HomeBudget
+# Home Budget
 
-HomeBudget is a Flutter app for managing a shared household budget on Android. Members can record expenses, set category limits, and follow spending together. Firebase Authentication and Cloud Firestore keep the household in sync across devices, while Firestore's offline cache supports temporary loss of connectivity.
+Home Budget is a Flutter app for managing a shared household budget on Android. Members can record expenses, set category limits, and follow spending together. Firebase Authentication and Cloud Firestore keep the household in sync across devices, while Firestore's offline cache supports temporary loss of connectivity.
 
 ## Features
 
@@ -49,4 +49,4 @@ Recurring templates do not create expenses automatically. One or more actual exp
 | [`mobile_flutter/test/`](mobile_flutter/test/) | Flutter tests |
 | [`mobile_flutter/firebase_rules_test/`](mobile_flutter/firebase_rules_test/) | Firestore Security Rules tests |
 
-HomeBudget is currently distributed as an Android build from source; it is not listed on Google Play.
+Home Budget is currently distributed as an Android build from source; it is not listed on Google Play.

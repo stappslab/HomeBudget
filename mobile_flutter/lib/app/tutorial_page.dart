@@ -14,7 +14,7 @@ enum TutorialTopic {
 }
 
 String tutorialTitle(TutorialTopic topic) => switch (topic) {
-  TutorialTopic.all => 'How HomeBudget works',
+  TutorialTopic.all => 'How Home Budget works',
   TutorialTopic.home => 'Home help',
   TutorialTopic.activity => 'Activity help',
   TutorialTopic.plan => 'Plan help',
@@ -218,7 +218,7 @@ class _AppTutorialPageState extends State<AppTutorialPage> {
                   child: Text(
                     page == selectedSteps.length - 1
                         ? (widget.topic == TutorialTopic.all
-                              ? 'Start using HomeBudget'
+                              ? 'Start using Home Budget'
                               : 'Back to screen')
                         : 'Next',
                   ),

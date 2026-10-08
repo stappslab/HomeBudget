@@ -80,7 +80,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Full tutorial'));
       await tester.pumpAndSettle();
-      expect(find.text('How HomeBudget works'), findsOneWidget);
+      expect(find.text('How Home Budget works'), findsOneWidget);
       expect(find.text('1 / 14'), findsOneWidget);
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();

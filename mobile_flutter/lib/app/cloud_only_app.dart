@@ -84,7 +84,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
     if (biometricLock) {
       authenticating = true;
       try {
-        if (await localAuth.authenticate(localizedReason: 'Unlock HomeBudget',
+        if (await localAuth.authenticate(localizedReason: 'Unlock Home Budget',
           biometricOnly: true, persistAcrossBackgrounding: true)) {
           unlocked = true;
           return true;
@@ -95,7 +95,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
     if (!pinEnabled || !mounted) return false;
     final controller = TextEditingController();
     final pin = await showDialog<String>(context: navigatorKey.currentContext!, builder: (context) => AlertDialog(
-      title: const Text('Unlock HomeBudget'),
+      title: const Text('Unlock Home Budget'),
       content: TextField(controller: controller, obscureText: true,
         keyboardType: TextInputType.number, maxLength: 8,
         decoration: const InputDecoration(labelText: 'Device PIN')),
@@ -219,7 +219,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) => MaterialApp(
     navigatorKey: navigatorKey,
-    title: 'HomeBudget', debugShowCheckedModeBanner: false,
+    title: 'Home Budget', debugShowCheckedModeBanner: false,
     theme: appTheme(), darkTheme: appTheme(brightness: Brightness.dark),
     themeMode: darkTheme ? ThemeMode.dark : ThemeMode.light,
     supportedLocales: const [Locale('en')],
@@ -229,7 +229,7 @@ class _CloudOnlyAppState extends State<CloudOnlyApp> with WidgetsBindingObserver
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const Icon(Icons.account_balance_wallet_outlined, size: 70, color: forest),
           const SizedBox(height: 20),
-          Text('Welcome to HomeBudget', textAlign: TextAlign.center,
+          Text('Welcome to Home Budget', textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 8),
           const Text('Your household budget, together and in sync.', textAlign: TextAlign.center),
